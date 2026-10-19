@@ -250,7 +250,7 @@ public:
     }
 
 
-    void verify_code()
+    int verify_code()
     {
         uint32_t current_address = 0;
 
@@ -309,7 +309,8 @@ public:
                     current_address += word_size_in_bytes;
                 }
                 outputFile.close();
-                exit(-1);
+
+                return 1;
             }
 
             write_cmd(CMD_NOP);
@@ -317,10 +318,12 @@ public:
         }
 
         std::cout<<"CODE VERIFIED"<<std::endl;
+
+        return 0;
     }
 
 
-    void verify_string()
+    int verify_string()
     {
         uint32_t current_address = start_string_addr;
 
@@ -369,13 +372,16 @@ public:
                     current_address += word_size_in_bytes;
                 }
                 outputFile.close();
-                exit(-1);
+
+                return 1;
             }
 
             write_cmd(CMD_NOP);
             current_address += word_size_in_bytes;
         }
         std::cout<<"STRING VERIFIED"<<std::endl;
+
+        return 0;
     }
 
     /*----------STATUS CHANGING OPERATIONS----------*/

@@ -209,6 +209,15 @@ void start_cicero(re2_driver& cicero, std::vector<std::string>& strings, std::ve
         uint32_t string_index = 0;
         for(std::string string : strings)
         {
+            int retries = 0;
+RETRY:
+
+            if (retries > 10)
+            {
+                continue;
+            }
+
+
             printf("%d ", string_index);
             cicero.write_cmd(re2_driver::CMD_RESET);
             cicero.write_cmd(re2_driver::CMD_RESET_PERF_CNTRS);
@@ -226,10 +235,13 @@ void start_cicero(re2_driver& cicero, std::vector<std::string>& strings, std::ve
 
                 cicero.start_AXI_M_transfer(len);
             }
-            //At this point CICERO driver's internal counter has the total time for memory transfers
+            //At this point CICERO driver's internal counter has the total time for memory transfers including the failed ones
 
-            cicero.verify_code();
-            cicero.verify_string();
+            if (!cicero.verify_code() || !cicero.verify_string())
+            {
+                retries++;
+                goto RETRY;
+            }
 
             auto start = std::chrono::high_resolution_clock::now();
 
