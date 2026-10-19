@@ -214,6 +214,8 @@ RETRY:
 
             if (retries > 10)
             {
+                fprintf(stderr, "Giving up on regex %u string %u after %d failed loads\n", regex_index, string_index, retries);
+                string_index++;
                 continue;
             }
 
@@ -237,7 +239,8 @@ RETRY:
             }
             //At this point CICERO driver's internal counter has the total time for memory transfers including the failed ones
 
-            if (!cicero.verify_code() || !cicero.verify_string())
+            // verify_* return 0 on success, non-zero on mismatch
+            if (cicero.verify_code() || cicero.verify_string())
             {
                 retries++;
                 goto RETRY;
